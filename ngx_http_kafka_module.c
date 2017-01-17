@@ -477,7 +477,10 @@ end:
         ngx_http_send_header(r);
         ngx_http_output_filter(r, &out);
     } else {
-        r->headers_out.status = NGX_HTTP_NO_CONTENT;
+        r->headers_out.status = NGX_HTTP_OK;
+        r->headers_out.content_length_n = 10;
+        //r->headers_out.content_type.data = (u_char *) "image/gif";
+        r->headers_out.content_type.data = "OK";
         ngx_http_send_header(r);
     }
 
