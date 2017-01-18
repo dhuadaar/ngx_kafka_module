@@ -485,7 +485,7 @@ end:
         buf->last = ngx_kafka_response + sizeof(ngx_kafka_response) - 1;
         buf->memory = 1;
         buf->last_buf = 1;
-        ngx_str_set(&(r->headers_out.content_type), "text/html");
+        ngx_str_set(&(r->headers_out.content_type), "text/plain");
         r->headers_out.status = NGX_HTTP_OK;
         r->headers_out.content_type.len = sizeof("text/plain") - 1;
         r->headers_out.content_type.data = (u_char *) "text/plain";
