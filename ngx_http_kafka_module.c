@@ -14,7 +14,7 @@
 
 #define KAFKA_TOPIC_MAXLEN 256
 #define KAFKA_BROKER_MAXLEN 512
-
+#define RESPONSE_MSG "OK"
 #define KAFKA_ERR_NO_DATA "no_message\n"
 #define KAFKA_ERR_BODY_TO_LARGE "body_too_large\n"
 #define KAFKA_ERR_PRODUCER "kafka_producer_error\n"
@@ -348,8 +348,8 @@ static ngx_int_t ngx_http_kafka_handler(ngx_http_request_t *r)
     if (rv >= NGX_HTTP_SPECIAL_RESPONSE) {
         return rv;
     }
-
-    return NGX_DONE;
+    return rv;
+//    return NGX_DONE;
 }
 
 
@@ -477,11 +477,24 @@ end:
         ngx_http_send_header(r);
         ngx_http_output_filter(r, &out);
     } else {
+        static u_char ngx_kafka_response[] = RESPONSE_MSG;
+        buf = ngx_pcalloc(r->pool, sizeof(ngx_buf_t));
+        out.buf = buf;
+        out.next = NULL;
+        buf->pos = ngx_kafka_response;
+        buf->last = ngx_kafka_response + sizeof(ngx_kafka_response) - 1;
+        buf->memory = 1;
+        buf->last_buf = 1;
+        ngx_str_set(&(r->headers_out.content_type), "text/html");
         r->headers_out.status = NGX_HTTP_OK;
-        r->headers_out.content_length_n = 10;
+        r->headers_out.content_type.len = sizeof("text/plain") - 1;
+        r->headers_out.content_type.data = (u_char *) "text/plain";
+        r->headers_out.content_length_n = sizeof(ngx_kafka_response);
         //r->headers_out.content_type.data = (u_char *) "image/gif";
-        r->headers_out.content_type.data = "OK";
+        //r->headers_out.content_type.data =  (u_char *)  "OK";
         ngx_http_send_header(r);
+        ngx_http_output_filter(r, &out);
+
     }
 
     ngx_http_finalize_request(r, NGX_OK);
